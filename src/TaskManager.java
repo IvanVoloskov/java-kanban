@@ -5,9 +5,9 @@ import java.util.HashMap;
 public class TaskManager {
     private int newId = 1;
 
-    HashMap<Integer,Task> tasks = new HashMap<>();
-    HashMap<Integer,Epic> epics = new HashMap<>();
-    HashMap<Integer,SubTask> subTasks = new HashMap<>();
+    private final HashMap<Integer,Task> tasks = new HashMap<>();
+    private final HashMap<Integer,Epic> epics = new HashMap<>();
+    private final HashMap<Integer,SubTask> subTasks = new HashMap<>();
 
     public Task createTask(Task task) {
         task.setId(newId);
@@ -29,7 +29,8 @@ public class TaskManager {
         subTasks.put(subTask.getId(), subTask);
         Epic epic = epics.get(subTask.getEpicId());
         if (epic != null) {
-            epic.addSubTaskId(subTask.getId());
+            epic.addSubTaskId(subTask.getEpicId());
+            updateEpicStatus(epic.getId());
         }
         return subTask;
     }
@@ -57,6 +58,10 @@ public class TaskManager {
 
     public void removeAllSubTasks() {
         subTasks.clear();
+        for (Epic epic : epics.values()) {
+            epic.getSubTaskId().clear();
+            epic.setStatus(Status.NEW);
+        }
     }
 
     public Task getTaskForId (int id) {
@@ -86,7 +91,9 @@ public class TaskManager {
             System.out.println("Эпика с таким id нет");
             return;
         }
-        epics.put(id, epic);
+        Epic epicNew = epics.get(id);
+        epicNew.setTitle(epic.getTitle());
+        epicNew.setDescription(epic.getDescription());
     }
 
     public void updateSubTask(SubTask subTask) {
