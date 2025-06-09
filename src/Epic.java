@@ -8,7 +8,11 @@ public class Epic extends Task {
     }
 
     public void addSubTaskId(int id) {
-        subTaskId.add(id);
+        if (id == this.getId()) {
+            System.out.println("Эпик не может содержать самого себя, как подзадачу");
+        } else {
+            subTaskId.add(id);
+        }
     }
 
     public void removeSubTaskId(Integer id) {

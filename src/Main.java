@@ -1,7 +1,7 @@
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager manager = new TaskManager();
+        TaskManager manager = Managers.getDefault();
 
         System.out.println("Поехали!");
         // Создаём задачи
