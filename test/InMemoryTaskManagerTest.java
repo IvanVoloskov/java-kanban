@@ -7,7 +7,8 @@ class InMemoryTaskManagerTest {
 
     @BeforeEach
     void init() {
-        manager = new InMemoryTaskManager();
+        HistoryManager history = Managers.getDefaultHistory();
+        manager = new InMemoryTaskManager(history);
     }
 
     @Test
