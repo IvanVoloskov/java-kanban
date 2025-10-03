@@ -24,4 +24,9 @@ public class Epic extends Task {
         return "Epic{id=" + getId() + ", title='" + getTitle() + "', status=" + getStatus() +
                 ", subTasks=" + subTaskId + "}";
     }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
 }
