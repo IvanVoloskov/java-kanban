@@ -1,9 +1,8 @@
-import java.nio.file.Files;
-import java.util.*;
 import java.io.*;
-import java.nio.*;
+import java.nio.file.Files;
+import java.util.List;
 
-public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private final File file;
 
@@ -12,33 +11,36 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         this.file = file;
     }
 
+
     public void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             writer.write("id,type,name,status,description,epic\n");
             for (Task task : getAllTasks()) {
-                writer.write(toString(task) + "\n");
+                writer.write(CsvTaskHelper.parseToString(task) + "\n");
             }
             for (Epic epic : getAllEpics()) {
-                writer.write(toString(epic) + "\n");
+                writer.write(CsvTaskHelper.parseToString(epic) + "\n");
             }
             for (SubTask subTask : getAllSubTasks()) {
-                writer.write(toString(subTask) + "\n");
+                writer.write(CsvTaskHelper.parseToString(subTask) + "\n");
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при сохранении файла", e);
         }
     }
 
+
     public static FileBackedTaskManager loadFromFile(File file, HistoryManager historyManager) {
         FileBackedTaskManager manager = new FileBackedTaskManager(historyManager, file);
 
         try {
-            String content = Files.readString(file.toPath());
-            String[] lines = content.split("\n");
+            List<String> lines = Files.readAllLines(file.toPath());
 
-            for (int i = 1; i < lines.length; i++) {
-                if (lines[i].isBlank()) continue;
-                Task task = fromString(lines[i]);
+            for (int i = 1; i < lines.size(); i++) {
+                String line = lines.get(i);
+                if (line.isBlank()) continue;
+
+                Task task = CsvTaskHelper.parseFromString(line);
                 switch (task.getType()) {
                     case TASK -> manager.createTask(task);
                     case EPIC -> manager.createEpic((Epic) task);
@@ -52,53 +54,100 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         return manager;
     }
 
-    private static Task fromString(String value) {
-        String[] fields = value.split(",");
-        int id = Integer.parseInt(fields[0]);
-        TaskType type = TaskType.valueOf(fields[1]);
-        String title = fields[2];
-        Status status = Status.valueOf(fields[3]);
-        String description = fields[4];
 
-        switch (type) {
-            case TASK -> {
-                Task task = new Task(title, description);
-                task.setId(id);
-                task.setStatus(status);
-                return task;
-            }
-            case EPIC -> {
-                Epic epic = new Epic();
-                epic.setId(id);
-                epic.setTitle(title);
-                epic.setDescription(description);
-                epic.setStatus(status);
-                return epic;
-            }
-            case SUBTASK -> {
-                SubTask subTask = new SubTask();
-                subTask.setId(id);
-                subTask.setTitle(title);
-                subTask.setDescription(description);
-                subTask.setStatus(status);
-                int epicId = Integer.parseInt(fields[5]);
-                subTask.setEpicId(epicId);
-                return subTask;
-            }
-            default -> throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
-        }
+    @Override
+    public Task createTask(Task task) {
+        Task created = super.createTask(task);
+        save();
+        return created;
     }
 
-    private static String toString(Task task) {
-        String base =  task.getId() + ", " + task.getType() + ", " +
-                task.getTitle() + ", " + task.getStatus() + ", " +
-                task.getDescription();
-        if (task instanceof SubTask) {
-            return base + "," + ((SubTask) task).getEpicId();
-        }
-        if (task instanceof Epic) {
-            return base + ",";
-        }
-        return base;
+    @Override
+    public Epic createEpic(Epic epic) {
+        Epic created = super.createEpic(epic);
+        save();
+        return created;
+    }
+
+    @Override
+    public SubTask createSubTask(SubTask subTask) {
+        SubTask created = super.createSubTask(subTask);
+        save();
+        return created;
+    }
+
+    @Override
+    public void updateTask(Task task) {
+        super.updateTask(task);
+        save();
+    }
+
+    @Override
+    public void updateEpic(Epic epic) {
+        super.updateEpic(epic);
+        save();
+    }
+
+    @Override
+    public void updateSubTask(SubTask subTask) {
+        super.updateSubTask(subTask);
+        save();
+    }
+
+    @Override
+    public void removeTaskById(int id) {
+        super.removeTaskById(id);
+        save();
+    }
+
+    @Override
+    public void removeEpicById(int id) {
+        super.removeEpicById(id);
+        save();
+    }
+
+    @Override
+    public void removeSubTaskById(int id) {
+        super.removeSubTaskById(id);
+        save();
+    }
+
+    @Override
+    public void removeAllTasks() {
+        super.removeAllTasks();
+        save();
+    }
+
+    @Override
+    public void removeAllEpics() {
+        super.removeAllEpics();
+        save();
+    }
+
+    @Override
+    public void removeAllSubTasks() {
+        super.removeAllSubTasks();
+        save();
+    }
+
+    @Override
+    public Task getTaskForId(int id) {
+        Task getTask = super.getTaskForId(id);
+        save();
+        return getTask;
+    }
+
+    @Override
+    public Epic getEpicForId(int id) {
+        Epic getEpic = super.getEpicForId(id);
+        save();
+        return getEpic;
+    }
+
+    @Override
+    public SubTask getSubTaskForId(int id) {
+        SubTask getSubTask = super.getSubTaskForId(id);
+        save();
+        return getSubTask;
     }
 }
