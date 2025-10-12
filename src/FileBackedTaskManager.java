@@ -32,14 +32,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public static FileBackedTaskManager loadFromFile(File file, HistoryManager historyManager) {
         FileBackedTaskManager manager = new FileBackedTaskManager(historyManager, file);
-
+        if (!file.exists()) {
+            return manager; // просто возвращаем пустой менеджер
+        }
         try {
             List<String> lines = Files.readAllLines(file.toPath());
-
             for (int i = 1; i < lines.size(); i++) {
                 String line = lines.get(i);
                 if (line.isBlank()) continue;
-
                 Task task = CsvTaskHelper.parseFromString(line);
                 switch (task.getType()) {
                     case TASK -> manager.createTask(task);
@@ -50,9 +50,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при загрузке файла", e);
         }
-
         return manager;
     }
+
 
 
     @Override
