@@ -91,6 +91,10 @@ public class Task {
     }
 
     public LocalDateTime getEndTime() {
-        return startTime.plus(duration);
+        if (duration != null) {
+            return startTime.plus(duration);
+        } else {
+            return startTime;
+        }
     }
 }

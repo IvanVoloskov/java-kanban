@@ -10,14 +10,8 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer,SubTask> subTasks = new HashMap<>();
     private final HistoryManager historyManager;
 
-    private final Comparator<Task> comparator = new Comparator<>() {
-        @Override
-        public int compare(Task t1, Task t2) {
-            return t1.getStartTime().compareTo(t2.getStartTime());
-        }
-    };
-
-    private final Set<Task> prioritizedTasks = new TreeSet<>(comparator);
+    private final Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime,
+            Comparator.nullsLast(Comparator.naturalOrder())));
 
 
     public InMemoryTaskManager(HistoryManager historyManager) {
@@ -26,10 +20,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task createTask(Task task) {
-        if (task.getStartTime() != null && checkIntersections(task)) {
-            throw new IllegalArgumentException("Невозможно добавить задачу, " +
-                    "так как задача пересекается с другой по времени выполнения");
-        }
+        crossingMessage(task);
         task.setId(newId);
         newId++;
         tasks.put(task.getId(), task);
@@ -49,10 +40,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public SubTask createSubTask(SubTask subTask) {
-        if (subTask.getStartTime() != null && checkIntersections(subTask)) {
-            throw new IllegalArgumentException("Невозможно добавить подзадачу, " +
-                    "так как подзадача пересекается с другой по времени выполнения");
-        }
+        crossingMessage(subTask);
         subTask.setId(newId);
         newId++;
         subTasks.put(subTask.getId(), subTask);
@@ -87,6 +75,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeAllTasks() {
         tasks.keySet().forEach(historyManager::remove);
         tasks.clear();
+        prioritizedTasks.clear();
     }
 
     @Override
@@ -95,13 +84,14 @@ public class InMemoryTaskManager implements TaskManager {
         subTasks.keySet().forEach(historyManager::remove);
         epics.clear();
         subTasks.clear();
-
+        prioritizedTasks.removeIf(task -> task instanceof Epic);
     }
 
     @Override
     public void removeAllSubTasks() {
         subTasks.keySet().forEach(historyManager::remove);
         subTasks.clear();
+        prioritizedTasks.removeIf(task -> task instanceof SubTask);
         epics.values().forEach(epic -> {
             epic.getSubTaskId().clear();
             epic.setStatus(Status.NEW);
@@ -138,11 +128,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) {
-        prioritizedTasks.remove(task);
-        if (task.getStartTime() != null && checkIntersections(task)) {
-            throw new IllegalArgumentException("Обновить задачу не получиться," +
-                    " так как задача пересекается с другой задачей по времени");
+        if (task.getStartTime() != null || checkIntersections(task)) {
+            prioritizedTasks.remove(task);
         }
+        crossingMessage(task);
         int id = task.getId();
         if (!tasks.containsKey(id)) {
             System.out.println("Задачи с таким id нет");
@@ -168,11 +157,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubTask(SubTask subTask) {
-        prioritizedTasks.remove(subTask);
-        if (subTask.getStartTime() != null && checkIntersections(subTask)) {
-            throw new IllegalArgumentException("Невозможно обновить подзадачу," +
-                    " так как подзадача пересекается с другой подзадачей по времени");
+        if (subTask.getStartTime() != null || checkIntersections(subTask)) {
+            prioritizedTasks.remove(subTask);
         }
+        crossingMessage(subTask);
         int id = subTask.getId();
         if (!subTasks.containsKey(id)) {
             System.out.println("Подзадачи с таким id нет");
@@ -323,5 +311,11 @@ public class InMemoryTaskManager implements TaskManager {
     public boolean checkIntersections (Task newTask) {
         return prioritizedTasks.stream()
                 .anyMatch(task -> isIntersecting(newTask, task));
+    }
+
+    public void crossingMessage (Task task) {
+        if (task.getStartTime() != null && checkIntersections(task)) {
+            throw new IllegalArgumentException("Ошибка: Задача пересекается с другой задачей по времени");
+        }
     }
 }
