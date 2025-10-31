@@ -1,3 +1,5 @@
+package model;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -23,7 +25,7 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "Epic{id=" + getId() + ", title='" + getTitle() + "', status=" + getStatus() +
+        return "model.Epic{id=" + getId() + ", title='" + getTitle() + "', status=" + getStatus() +
                 ", subTasks=" + subTaskId + "}";
     }
 

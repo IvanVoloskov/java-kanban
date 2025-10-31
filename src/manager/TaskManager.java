@@ -1,3 +1,9 @@
+package manager;
+
+import model.Epic;
+import model.SubTask;
+import model.Task;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,4 +47,6 @@ public interface TaskManager {
     List<SubTask> getSubTasksByEpicId(int epicId);
 
     List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }

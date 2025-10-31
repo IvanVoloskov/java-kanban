@@ -1,3 +1,5 @@
+package model;
+
 import java.util.Objects;
 import java.time.*;
 
@@ -59,7 +61,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{id=" + id + ", title='" + title + "', status=" + status + "}";
+        return "model.Task{id=" + id + ", title='" + title + "', status=" + status + "}";
     }
 
     public int getId() {
@@ -90,7 +92,7 @@ public class Task {
         this.duration = duration;
     }
 
-    public LocalDateTime getEndTime() {
+     public LocalDateTime getEndTime() {
         if (duration != null) {
             return startTime.plus(duration);
         } else {

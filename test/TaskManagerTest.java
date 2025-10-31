@@ -1,3 +1,8 @@
+import manager.TaskManager;
+import model.Epic;
+import model.Status;
+import model.SubTask;
+import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
@@ -17,7 +22,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
         manager = createManager();
     }
 
-    // ===== Тесты для Epic =====
+    // ===== Тесты для model.Epic =====
     @Test
     void epicStatus_allNew() {
         Epic epic = new Epic();

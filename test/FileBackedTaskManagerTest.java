@@ -1,3 +1,5 @@
+import manager.Managers;
+import model.Task;
 import org.junit.jupiter.api.Test;
 import java.io.File;
 
@@ -14,7 +16,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
     @Test
     void saveAndLoadFromFile() {
-        Task task = new Task("Task", "Desc");
+        Task task = new Task("model.Task", "Desc");
         manager.createTask(task);
 
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(file, Managers.getDefaultHistory());

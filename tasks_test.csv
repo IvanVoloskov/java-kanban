@@ -1,2 +1,2 @@
 id,type,name,status,description,epic
-1,TASK,Task,NEW,Desc,0,
+1,TASK,model.Task,NEW,Desc,0,
