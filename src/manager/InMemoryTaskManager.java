@@ -310,18 +310,18 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(prioritizedTasks);
     }
 
-    public boolean isIntersecting (Task t1, Task t2) {
+    public boolean isIntersecting(Task t1, Task t2) {
         if (t1.getStartTime() == null || t1.getEndTime() == null) return false;
         if (t2.getStartTime() == null || t2.getEndTime() == null) return false;
         return t1.getEndTime().isAfter(t2.getStartTime()) && t1.getStartTime().isBefore(t2.getEndTime());
     }
 
-    public boolean checkIntersections (Task newTask) {
+    public boolean checkIntersections(Task newTask) {
         return prioritizedTasks.stream()
                 .anyMatch(task -> isIntersecting(newTask, task));
     }
 
-    public void crossingMessage (Task task) {
+    public void crossingMessage(Task task) {
         if (task.getStartTime() != null && checkIntersections(task)) {
             throw new IllegalArgumentException("Ошибка: Задача пересекается с другой задачей по времени");
         }
