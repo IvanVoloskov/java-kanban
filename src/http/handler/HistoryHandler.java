@@ -15,7 +15,7 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson = GsonFactory.createGson();
 
-    public HistoryHandler (TaskManager manager) {
+    public HistoryHandler(TaskManager manager) {
         this.manager = manager;
     }
 

@@ -14,7 +14,7 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson = GsonFactory.createGson();
 
-    public SubTaskHandler (TaskManager manager) {
+    public SubTaskHandler(TaskManager manager) {
         this.manager = manager;
     }
 
