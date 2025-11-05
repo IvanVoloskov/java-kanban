@@ -14,11 +14,19 @@ public class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
 
     @Override
     public void write(final JsonWriter jsonWriter, final LocalDateTime value) throws IOException {
+        if (value == null) {
+            jsonWriter.nullValue();
+            return;
+        }
         jsonWriter.value(value.format(FORMATTER));
     }
 
     @Override
     public LocalDateTime read(final JsonReader jsonReader) throws IOException {
+        if (jsonReader.peek() == com.google.gson.stream.JsonToken.NULL) {
+            jsonReader.nextNull();
+            return null;
+        }
         return LocalDateTime.parse(jsonReader.nextString(), FORMATTER);
     }
 }
