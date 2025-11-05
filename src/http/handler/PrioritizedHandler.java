@@ -12,11 +12,11 @@ import java.io.IOException;
 import java.util.List;
 
 
-public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler{
+public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson = GsonFactory.createGson();
 
-    public PrioritizedHandler (TaskManager manager) {
+    public PrioritizedHandler(TaskManager manager) {
         this.manager = manager;
     }
 
