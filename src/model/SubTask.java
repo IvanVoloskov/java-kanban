@@ -1,3 +1,5 @@
+package model;
+
 public class SubTask extends Task {
     private int epicId;
 
@@ -15,8 +17,13 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "SubTask{id=" + getId() + ", title='" + getTitle() + "', status=" + getStatus() +
+        return "model.SubTask{id=" + getId() + ", title='" + getTitle() + "', status=" + getStatus() +
                 ", epicId=" + epicId + "}";
+    }
+
+    @Override
+    public TaskType getType() {
+        return TaskType.SUBTASK;
     }
 
 }

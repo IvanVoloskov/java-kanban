@@ -1,10 +1,15 @@
+package model;
+
 import java.util.Objects;
+import java.time.*;
 
 public class Task {
     private String title;
     private String description;
     private int id;
     private Status status;
+    private Duration duration;
+    private LocalDateTime startTime;
 
     public Status getStatus() {
         return status;
@@ -56,7 +61,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{id=" + id + ", title='" + title + "', status=" + status + "}";
+        return "model.Task{id=" + id + ", title='" + title + "', status=" + status + "}";
     }
 
     public int getId() {
@@ -65,5 +70,33 @@ public class Task {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+     public LocalDateTime getEndTime() {
+        if (duration != null) {
+            return startTime.plus(duration);
+        } else {
+            return startTime;
+        }
     }
 }
